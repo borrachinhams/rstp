@@ -30,16 +30,24 @@ if __name__ == '__main__':
         import re
         import argparse
 
-        if len(sys.argv) < 2 or '--help' in sys.argv:
-            print("--target     Set target with netmask Ex:\n"
-                  "             --target 192.168.0.1/24")
+        parser = argparse.ArgumentParser(description='Change options for execute the Script',
+                                         prefix_chars='--')
 
-        elif '--target' in sys.argv:
-            print(sys.argv)
-            network = re.findall(r'[0-9\.\/]+', str(sys.argv))
-            print(network)
-            for ip in ipcalc.Network(network[0]):
-                openPort(ip)
+        parser.add_argument('--target', action='store', type=str,
+                            help='Use for set Network')
+        '''
+        parser.add_argument('--fast', action='store', type=str,
+                            help='fast action')
+        '''
+        result = parser.parse_args()
+
+        if result.target != None:
+            print('Scanning - ' + result.target)
+            network = result.target
+            for ip in ipcalc.Network(network):
+                openPort(str(ip))
+        else:
+            print("Please enter the valid option")
 
     except Exception as err:
         print("Option unknow\nTry --help")
