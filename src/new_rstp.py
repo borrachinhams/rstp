@@ -28,6 +28,7 @@ if __name__ == '__main__':
         import ipcalc
         import subprocess
         import re
+        import argparse
 
         if len(sys.argv) < 2 or '--help' in sys.argv:
             print("--target     Set target with netmask Ex:\n"
